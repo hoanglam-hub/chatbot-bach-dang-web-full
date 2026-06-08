@@ -1,0 +1,14 @@
+EMBEDDING:
+  model: text-embedding-3-small
+
+LLM:
+  model: gpt-5-mini
+
+CHUNKING:
+  size: 500
+  overlap: 50
+
+VECTORSTORE:
+  path: processedData/vectorstore
+
+

@@ -1,0 +1,6 @@
+.venv/
+dataRaw/
+processedData/
+.env
+__pycache__/
+*.pyc
