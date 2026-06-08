@@ -1,12 +1,12 @@
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from config.loader import llm_model
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
 def generation(retriever, prompt):
     template = ChatPromptTemplate.from_template(prompt)
-    llm = ChatOpenAI(
+    llm = ChatGoogleGenerativeAI(
         model = llm_model,
         temperature = 0.1
     )

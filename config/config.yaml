@@ -1,12 +1,12 @@
 EMBEDDING:
-  model: text-embedding-3-small
+  model: gemini-embedding-001
 
 LLM:
-  model: gpt-5-mini
+  model: gemini-2.0-flash
 
 CHUNKING:
-  size: 500
-  overlap: 50
+  size: 1500
+  overlap: 100
 
 VECTORSTORE:
   path: processedData/vectorstore
