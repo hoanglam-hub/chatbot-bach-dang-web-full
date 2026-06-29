@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 gemini_API_key = os.getenv("GEMINI_API_KEY")
 
+
 def embed_and_store(chunks):
     embedding = GoogleGenerativeAIEmbeddings(
         model = embedding_model,

@@ -10,4 +10,4 @@ embedding_model = cfg["EMBEDDING"]["model"]
 llm_model = cfg["LLM"]["model"]
 chunk_size = cfg["CHUNKING"]["size"]
 chunk_overlap = cfg["CHUNKING"]["overlap"]
-vectorstore_path = cfg["VECTORSTORE"]["path"]
+vectorstore_path = os.path.join(direction, cfg["VECTORSTORE"]["path"])

@@ -1,6 +1,9 @@
 from markitdown import MarkItDown
 import os
 from langchain_core.documents import Document
+import logging
+
+logger = logging.getLogger(__name__)
 
 def markitdown_loader():
     md = MarkItDown()
@@ -12,4 +15,5 @@ def markitdown_loader():
         # chuyển result thành dạng Document của langchain để có thể split (vì result đang ở dạng của markitdown nên không split trực tiếp được)
         document = Document(page_content = result.text_content, metadata = {"source": file})
         docs.append(document)
+        logger.info("process loader done!")
     return docs

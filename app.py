@@ -1,0 +1,55 @@
+import streamlit as st
+import os
+from ingestion.pipeline import load_and_chunk
+from embedding.embedding import embed_and_store, load_vectorstore
+from retrieval.retriever import get_retriever
+from generation.generation import generation
+from config.loader import vectorstore_path
+
+prompt = (
+    "You are an assistant for question-answering tasks. "
+    "If you don't know the answer, say that you don't know. "
+    "use only the provided context to answer."
+    "Do not guess, use outside knowledge, or web information."
+    "If applicable, cite sources as (source: page) using the metadata"
+    "Context: \n{context}\n\n"
+    "Question: {question}"
+)
+
+st.set_page_config(
+     page_title="Chatbot",
+     page_icon="🤖",
+     layout="centered"
+ )
+
+st.title("🤖 Chatbot")
+
+@st.cache_resource
+def init_retriever():
+    if not os.path.exists(vectorstore_path):
+        chunks = load_and_chunk()
+        vs = embed_and_store(chunks)
+    else:
+        vs = load_vectorstore()
+    return get_retriever(vs)
+
+retriever = init_retriever()
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+if question := st.chat_input("Question: "):
+    with st.chat_message("user"):
+        st.write(question)
+    st.session_state.messages.append({"role": "user", "content": question})
+
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            answer = generation(retriever, question, prompt)
+        st.write(answer)
+    st.session_state.messages.append({"role": "assistant", "content": answer})
+

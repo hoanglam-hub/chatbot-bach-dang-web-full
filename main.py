@@ -21,6 +21,10 @@ if not os.path.exists(vectorstore_path):
     vs = embed_and_store(chunks)
 else:
     vs = load_vectorstore()
+question = input("Question: ")
 retrieve = get_retriever(vs)
-generation(retrieve, prompt)
+generation(retrieve, prompt, question)
+
+
+
 
