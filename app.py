@@ -49,7 +49,7 @@ if question := st.chat_input("Question: "):
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            answer = generation(retriever, question, prompt)
+            answer = generation(retriever, prompt, question)
         st.write(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
 
