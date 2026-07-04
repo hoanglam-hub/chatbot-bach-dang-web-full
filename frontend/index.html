@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="background"></div>
+
+    <div class="sidebar">
+        <img src="/static/coc.png" alt="Cọc" onclick="showImage('/static/coc.png', 'Cọc')">
+        <img src="/static/thuyen.png" alt="Thuyền" onclick="showImage('/static/thuyen.png', 'Thuyền')">
+        <img src="/static/ngo_quyen.png" alt="Ngô Quyền" onclick="showImage('/static/ngo_quyen.png', 'Ngô Quyền')">
+        <img src="/static/bando.png" alt="Bản đồ" onclick="showImage('/static/bando.png', 'Bản đồ')">
+    </div>
+
+    <div class="chat-container">
+        <h1>Chatbot</h1>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-area">
+            <input
+                type="text"
+                id="questionInput"
+                placeholder="Question:"
+                onkeypress="handleKeyPress(event)"
+            >
+            <button onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
