@@ -11,14 +11,14 @@
     <div class="background"></div>
 
     <div class="sidebar">
-        <img src="/static/coc.png" alt="Cọc" onclick="showImage('/static/coc.png', 'Cọc')">
-        <img src="/static/thuyen.png" alt="Thuyền" onclick="showImage('/static/thuyen.png', 'Thuyền')">
-        <img src="/static/ngo_quyen.png" alt="Ngô Quyền" onclick="showImage('/static/ngo_quyen.png', 'Ngô Quyền')">
-        <img src="/static/bando.png" alt="Bản đồ" onclick="showImage('/static/bando.png', 'Bản đồ')">
+        <img src="/static/coc.png" alt="Cọc" onclick="showImage('/static/coc.png', 'Coc')">
+        <img src="/static/thuyen.png" alt="Thuyền" onclick="showImage('/static/thuyen.png', 'Thuyen')">
+        <img src="/static/ngo_quyen.png" alt="Ngô Quyền" onclick="showImage('/static/ngo_quyen.png', 'Ngo Quyen')">
+        <img src="/static/bando.png" alt="Bản đồ" onclick="showImage('/static/bando.png', 'Ban do')">
     </div>
 
     <div class="chat-container">
-        <h1>Chatbot</h1>
+        <h1>Bach Dang Battle Chatbot</h1>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-area">
             <input
@@ -27,7 +27,8 @@
                 placeholder="Question:"
                 onkeypress="handleKeyPress(event)"
             >
-            <button onclick="sendMessage()">➤</button>
+            <button id="sendBtn" onclick="sendMessage()">➤</button>
+            <button id="stopBtn" onclick="stopMessage()" style="display:none; background:rgba(255,50,50,0.7); border:none; border-radius:8px; padding:8px 15px; color:white; font-size:18px; cursor:pointer;">■</button>
         </div>
     </div>
 
