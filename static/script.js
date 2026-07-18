@@ -111,7 +111,7 @@ async function sendMessage() {
             });
             const data = await response.json();
             removeLoading(loadingId);
-            addMessage("assistant", data.answer, []);
+            addMessage("assistant", data.answer, [], null);
             removeAllPreviews();
         } else {
             const response = await fetch("/chat", {
@@ -122,14 +122,14 @@ async function sendMessage() {
             });
             const data = await response.json();
             removeLoading(loadingId);
-            addMessage("assistant", data.answer, []);
+            addMessage("assistant", data.answer, [], data.image);  // ← truyền data.image
         }
     } catch (error) {
         removeLoading(loadingId);
         if (error.name === "AbortError") {
-            addMessage("assistant", "Request cancelled.", []);
+            addMessage("assistant", "Request cancelled.", [], null);
         } else {
-            addMessage("assistant", "Sorry, an error occurred.", []);
+            addMessage("assistant", "Sorry, an error occurred.", [], null);
         }
     } finally {
         isLoading = false;
@@ -145,7 +145,7 @@ function stopMessage() {
     }
 }
 
-function addMessage(role, text, images) {
+function addMessage(role, text, images, imageBase64 = null) {
     const chatBox = document.getElementById("chatBox");
     const div = document.createElement("div");
     div.className = `message ${role}`;
@@ -162,24 +162,35 @@ function addMessage(role, text, images) {
         </div>
     `;
 
+    const bubble = div.querySelector(".bubble");
+
+    // Ảnh user paste vào
     if (isUser && images && images.length > 0) {
-        const bubble = div.querySelector(".bubble");
         images.forEach(file => {
             const url = URL.createObjectURL(file);
             const imgEl = document.createElement("img");
             imgEl.src = url;
             imgEl.style.cssText = "max-width:150px; border-radius:8px; margin-top:6px; display:block; cursor:pointer;";
             imgEl.onclick = function() {
-                console.log("Image clicked, url:", url);
                 showImageFromUrl(url);
             };
             bubble.appendChild(imgEl);
         });
     }
 
+    // Ảnh được generate từ bot
+    if (!isUser && imageBase64) {
+        const imgEl = document.createElement("img");
+        imgEl.src = `data:image/png;base64,${imageBase64}`;
+        imgEl.style.cssText = "max-width:300px; border-radius:8px; margin-top:6px; display:block; cursor:pointer;";
+        imgEl.onclick = function() { showImageFromUrl(imgEl.src); };
+        bubble.appendChild(imgEl);
+    }
+
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 function addLoading() {
     const chatBox = document.getElementById("chatBox");
     const div = document.createElement("div");
@@ -264,7 +275,6 @@ function showImageFromUrl(url) {
         cursor: default;
     `;
 
-    // Nút điều khiển
     const controls = document.createElement("div");
     controls.style.cssText = `
         position: fixed;
@@ -333,12 +343,10 @@ function showImageFromUrl(url) {
     overlay.appendChild(controls);
     document.body.appendChild(overlay);
 
-    // Nhấn vào nền để đóng
     overlay.onclick = function(e) {
         if (e.target === overlay) overlay.remove();
     };
 
-    // Scroll chuột để zoom
     overlay.addEventListener("wheel", function(e) {
         e.preventDefault();
         if (e.deltaY < 0) {
@@ -349,3 +357,4 @@ function showImageFromUrl(url) {
         img.style.transform = `scale(${scale})`;
     });
 }
+

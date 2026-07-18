@@ -37,9 +37,12 @@ prompt = (
     "If the exact information is not explicitly stated in the context, "
     "you MUST say: 'I don't know. This information is not in the provided documents.' "
     "Do NOT infer, estimate, or use any external knowledge under any circumstances. "
-    "Do not guess, use outside knowledge, or web information. "
     "Answer in the same language as the question. "
     "Keep your answer concise, maximum 7 sentences. "
+    "When answering in English, use these English equivalents for Vietnamese historical terms: "
+    "Nam Han = Southern Han dynasty, Ngo Quyen = King Ngo Quyen, "
+    "Hoang Thao = General Hoang Thao, Nguyen Tat To = Commander Nguyen Tat To, "
+    "Tran Hung Dao = General Tran Hung Dao, Bach Dang River = Bach Dang River. "
     "Context: \n{context}\n\n"
     "Question: {question}"
 )
@@ -58,14 +61,31 @@ def read_root():
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     question = request.question
+    print(f"DEBUG: question = {question}")
 
     image_keywords = ["tạo ảnh", "tạo hình ảnh", "vẽ ảnh", "generate image", "draw", "create image"]
     wants_image = any(keyword in question.lower() for keyword in image_keywords)
+    print(f"DEBUG: wants_image = {wants_image}")
 
     image_base64 = None
 
     if wants_image:
-        answer = "Image generation feature is not activated yet."
+        try:
+            image_response = client.models.generate_content(
+                model="gemini-3.1-flash-lite-image",
+                contents=f"Generate a historical Vietnamese battle scene image: {question}",
+            )
+            print(f"DEBUG: parts = {image_response.candidates[0].content.parts}")
+            for part in image_response.candidates[0].content.parts:
+                print(f"DEBUG: part type = {type(part)}, has inline_data = {hasattr(part, 'inline_data')}")
+                if hasattr(part, 'inline_data') and part.inline_data:
+                    image_base64 = base64.b64encode(part.inline_data.data).decode()
+                    print(f"DEBUG: image found, base64 length = {len(image_base64)}")
+                    break
+            answer = "Here is the generated image based on your request."
+        except Exception as e:
+            print(f"Image generation error: {e}")
+            answer = f"Image generation failed: {str(e)}"
     else:
         answer = generation(retriever, question, prompt)
 
@@ -89,8 +109,25 @@ async def chat_with_image(
             }
         })
 
+    image_prompt = f"""You are a helpful assistant analyzing images from a water level monitoring system.
+
+    The system uses color detection to identify water levels with these labels shown in the top-left corner:
+    - "NONE": No water level detected, water is above all color markers
+    - "CAO" (High): Water level is high, only the top red marker is visible
+    - "TB" (Medium): Water level is medium, red and blue markers are visible  
+    - "THAP" (Low): Water level is low, all three markers (red, blue, green) are visible
+
+    The timestamp shown in yellow (format MM:SS or HH:MM:SS) indicates elapsed time.
+    The colored rectangles with "+" signs are the color detection zones.
+
+    Carefully observe all text, numbers, labels and colored boxes in the image.
+    Answer in the same language as the question.
+    Maximum 7 sentences.
+
+    Question: {question}"""
+
     parts.append({
-        "text": f"Answer in the same language as the question. Maximum 7 sentences.\n\nQuestion: {question}"
+        "text": image_prompt
     })
 
     response = client.models.generate_content(
@@ -99,3 +136,4 @@ async def chat_with_image(
     )
 
     return {"answer": response.text}
+
